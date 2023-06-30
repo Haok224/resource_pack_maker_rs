@@ -8,14 +8,14 @@ class UserInterface {open
   } {
     Fl_Window window {
       label {资源包制作器} open
-      xywh {800 241 550 400} type Double hide
+      xywh {800 241 550 400} type Double visible
     } {
       Fl_Tabs tabs {open
         xywh {0 0 550 400} align 4
       } {
         Fl_Group pack_config_tab {
           label {资源包选项} open
-          xywh {45 35 480 355}
+          xywh {45 35 480 355} hide
         } {
           Fl_Input pack_name {
             label {资源包名}
@@ -33,7 +33,7 @@ class UserInterface {open
             label {浏览}
             xywh {385 175 80 25}
           }
-          Fl_Box icon_box {selected
+          Fl_Box icon_box {
             xywh {165 230 128 128}
           }
           Fl_Choice {} {
@@ -43,7 +43,7 @@ class UserInterface {open
         }
         Fl_Group {} {
           label {字体} open
-          xywh {45 35 480 355} hide
+          xywh {45 35 480 355}
         } {
           Fl_Round_Button choose_ttf_mode {
             label {选择Ttf文件}
@@ -64,6 +64,10 @@ class UserInterface {open
           Fl_Choice system_fonts_choise {open
             xywh {165 230 25 25} down_box BORDER_BOX
           } {}
+          Fl_Input font_view {
+            label {字体预览} selected
+            xywh {165 285 300 25}
+          }
         }
       }
     }

@@ -1,24 +1,22 @@
 use fltk::{
     button::{Button, RoundButton},
+    dialog::NativeFileChooser,
+    enums::Font,
     image::PngImage,
     input::Input,
-    prelude::{InputExt, WidgetExt, WindowExt},
+    prelude::{ButtonExt, InputExt, WidgetExt, WindowExt},
     window::Window,
     *,
 };
-use std::{os::windows::ffi::OsStrExt, iter::once};
+use resource_pack_maker::reg_tool;
 
-use winapi::{shared::minwindef::{HKEY, DWORD}, um::winreg::HKEY_CURRENT_USER};
-use std::ptr::null_mut;
-use winapi::um::winreg::{RegOpenKeyW, RegQueryValueExW};
-use std::ffi::OsStr;
-use winapi::shared::winerror::SEC_E_OK;
-use fltk_theme::{WidgetTheme};
+use fltk_theme::WidgetTheme;
+use winapi::um::winreg::HKEY_CURRENT_USER;
 mod ui;
 fn main() {
     //app
     let app = app::App::default().with_scheme(app::Scheme::Oxy);
-    let ui = ui::UserInterface::make_window();
+    let mut ui = ui::UserInterface::make_window();
     //Set theme
     let logo = image::PngImage::from_data(&[
         137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 16, 0, 0, 0, 16, 8,
@@ -44,14 +42,18 @@ fn main() {
     ])
     .unwrap();
     //check the system theme
-    let hkey = reg_open(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize").unwrap();
-    let binding = reg_query_binary(&hkey, "AppsUseLightTheme");
+    let hkey = reg_tool::reg_open(
+        HKEY_CURRENT_USER,
+        "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+    )
+    .unwrap();
+    let binding = reg_tool::reg_query_binary(&hkey, "AppsUseLightTheme");
     let dark_value = binding.get(0);
     let dark_value = dark_value.unwrap(); // 0:dark 1:light
     if dark_value == &1 {
         let theme = WidgetTheme::new(fltk_theme::ThemeType::Metro);
         theme.apply();
-    }else {
+    } else {
         let theme = WidgetTheme::new(fltk_theme::ThemeType::Dark);
         theme.apply();
     }
@@ -78,9 +80,14 @@ fn main() {
     let mut icon_input = ui.icon_choose;
     choose_icon_button.set_callback(move |_| {
         let mut dialog = dialog::NativeFileChooser::new(dialog::NativeFileChooserType::BrowseFile);
+        dialog.set_filter("*.png");
         dialog.show();
         let path = dialog.filename();
-        let image = PngImage::load(path.clone()).unwrap();
+        if !path.exists() {
+            return;
+        }
+        println!("{}", &path.to_str().unwrap_or_else(|| { "Path is none." }));
+        let image = PngImage::load(path.clone()).expect("Failed to load image.");
         println!("{:?}", image);
         icon_box.set_image_scaled(Some(image));
         icon_box.redraw();
@@ -88,55 +95,53 @@ fn main() {
     });
 
     //Radio button
-    let mut choose_ttf_mode:RoundButton = ui.choose_ttf_mode;
-    choose_ttf_mode.do_callback();
+    let mut choose_ttf_mode: RoundButton = ui.choose_ttf_mode.clone();
+    let choose_system_mode: RoundButton = ui.choose_system_font_mode.clone();
+    let mut ttf_browse = ui.ttf_browse.clone();
+    let mut b = choose_system_mode.clone();
+    let mut choise = ui.system_fonts_choise.clone();
+    let mut ttf_browse_a = ttf_browse.clone();
+    let mut ttf_file_output = ui.ttf_output.clone();
+    choose_ttf_mode.set_callback(move |sel| {
+        // if other radio button is select;set its value
+        if sel.value() {
+            b.set_value(false);
+            let _ = &choise.hide();
+            ttf_browse_a.show();
+            ttf_file_output.show();
+        }
+    });
+    let mut output = ui.ttf_output.clone();
+    let mut choise = ui.system_fonts_choise;
+    ui.choose_system_font_mode.set_callback(move |sel| {
+        if sel.value() {
+            let _ = &mut choose_ttf_mode.set_value(false);
+            //hide other widgets
+            output.hide();
+            let mut b = ui.ttf_browse.clone();
+            b.hide();
+            choise.show();
+        }
+    });
+    //font set & view
+    let mut ttf_out = ui.ttf_output.clone();
+    let _ = &mut ttf_browse.set_callback(move |_| {
+        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
+        dialog.set_filter("*.ttf");
+        dialog.show();
+        let path: std::path::PathBuf = dialog.filename();
+        if !path.exists() {
+            return;
+        }
+
+        let f = Font::load_font(path.clone()).unwrap();
+        println!("{f}");
+        // let f = Font::by_name(f.as_str());
+        // println!("{}",f.get_name());
+        Font::set_font(Font::Helvetica, f.as_str());
+        ttf_out.set_value(path.to_str().unwrap());
+    });
+    //Run app
+    ui.pack_config_tab.show();
     app.run().unwrap();
-}
-
-/// Open the registry table
-pub(crate) fn reg_open(main_hkey: HKEY, sub_key: &str) -> Result<HKEY, String> {
-    unsafe {
-        let mut hkey: HKEY = null_mut();
-        let status = RegOpenKeyW(main_hkey,
-                                 str_to_lpcwstr(sub_key).as_ptr(),
-                                 &mut hkey);
-        if status == SEC_E_OK {
-            return Result::Ok(hkey);
-        }
-        return Result::Err(format!("status == {}", status));
-    }
-}
-
-unsafe fn str_to_lpcwstr(str: &str) -> Vec<u16> {
-    let result: Vec<u16> = OsStr::new(str).encode_wide().chain(once(0)).collect();
-    return result;
-}
-
-/// Check the registry value
-pub(crate) fn reg_query_binary(hkey: &HKEY, key_name: &str) -> Vec<u8> {
-    unsafe {
-        let mut dword: DWORD = 0;
-        let mut dtype: DWORD = 0;
-
-        //查询
-        let status = RegQueryValueExW(*hkey,
-                                      str_to_lpcwstr(key_name).as_ptr(),
-                                      null_mut(),
-                                      &mut dtype,
-                                      null_mut(),
-                                      &mut dword);
-
-        let mut data_binary: Vec<u8> = vec![0; dword as usize];
-        if status == SEC_E_OK {
-            // 存在值
-
-            RegQueryValueExW(*hkey,
-                             str_to_lpcwstr(key_name).as_ptr(),
-                             null_mut(),
-                             &mut dtype,
-                             data_binary.as_mut_ptr(),
-                             &mut dword);
-        }
-        return data_binary;
-    }
 }
