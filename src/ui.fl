@@ -1,0 +1,71 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0400
+header_name {.h}
+code_name {.cxx}
+class UserInterface {open
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window window {
+      label {资源包制作器} open
+      xywh {800 241 550 400} type Double hide
+    } {
+      Fl_Tabs tabs {open
+        xywh {0 0 550 400} align 4
+      } {
+        Fl_Group pack_config_tab {
+          label {资源包选项} open
+          xywh {45 35 480 355}
+        } {
+          Fl_Input pack_name {
+            label {资源包名}
+            xywh {165 65 300 25}
+          }
+          Fl_Input des_input {
+            label {描述}
+            xywh {165 120 300 25}
+          }
+          Fl_Output icon_choose {
+            label {图标}
+            xywh {165 175 220 25}
+          }
+          Fl_Button icon_browse {
+            label {浏览}
+            xywh {385 175 80 25}
+          }
+          Fl_Box icon_box {selected
+            xywh {165 230 128 128}
+          }
+          Fl_Choice {} {
+            label {版本} open
+            xywh {395 230 25 25} down_box BORDER_BOX
+          } {}
+        }
+        Fl_Group {} {
+          label {字体} open
+          xywh {45 35 480 355} hide
+        } {
+          Fl_Round_Button choose_ttf_mode {
+            label {选择Ttf文件}
+            xywh {165 65 25 25} down_box ROUND_DOWN_BOX
+          }
+          Fl_Round_Button choose_system_font_mode {
+            label {选择系统字体}
+            xywh {165 175 25 25} down_box ROUND_DOWN_BOX
+          }
+          Fl_Output ttf_output {
+            label {Ttf文件}
+            xywh {165 120 220 25}
+          }
+          Fl_Button ttf_browse {
+            label {浏览}
+            xywh {385 120 80 25}
+          }
+          Fl_Choice system_fonts_choise {open
+            xywh {165 230 25 25} down_box BORDER_BOX
+          } {}
+        }
+      }
+    }
+  }
+}
