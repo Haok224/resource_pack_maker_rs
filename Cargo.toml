@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 fltk = "1.4.5"
 fltk-theme = "0.7.1"
+walkdir = "2.3.3"
 winapi = {version = "0.3.9",features  = ["winerror","winreg"]}
 
 [build-dependencies]

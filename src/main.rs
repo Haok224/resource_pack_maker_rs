@@ -1,17 +1,21 @@
+use std::env;
+
 use fltk::{
     button::{Button, RoundButton},
     dialog::NativeFileChooser,
     enums::Font,
     image::PngImage,
     input::Input,
-    prelude::{ButtonExt, InputExt, WidgetExt, WindowExt},
+    prelude::{ButtonExt, InputExt, MenuExt, WidgetExt, WindowExt},
     window::Window,
     *,
 };
 use resource_pack_maker::reg_tool;
 
 use fltk_theme::WidgetTheme;
+
 use winapi::um::winreg::HKEY_CURRENT_USER;
+
 mod ui;
 fn main() {
     //app
@@ -112,7 +116,7 @@ fn main() {
         }
     });
     let mut output = ui.ttf_output.clone();
-    let mut choise = ui.system_fonts_choise;
+    let mut choise = ui.system_fonts_choise.clone();
     ui.choose_system_font_mode.set_callback(move |sel| {
         if sel.value() {
             let _ = &mut choose_ttf_mode.set_value(false);
@@ -121,10 +125,12 @@ fn main() {
             let mut b = ui.ttf_browse.clone();
             b.hide();
             choise.show();
+            choise.do_callback();
         }
     });
     //font set & view
     let mut ttf_out = ui.ttf_output.clone();
+    let mut view = ui.font_view.clone();
     let _ = &mut ttf_browse.set_callback(move |_| {
         let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
         dialog.set_filter("*.ttf");
@@ -134,14 +140,41 @@ fn main() {
             return;
         }
 
-        let f = Font::load_font(path.clone()).unwrap();
+        let f = app.load_font(path.clone()).unwrap();
         println!("{f}");
         // let f = Font::by_name(f.as_str());
         // println!("{}",f.get_name());
-        Font::set_font(Font::Helvetica, f.as_str());
+        view.set_text_font(Font::by_name(&f));
+        view.redraw();
         ttf_out.set_value(path.to_str().unwrap());
     });
-    //Run app
+    //get fonts
     ui.pack_config_tab.show();
+    let mut choise: menu::Choice = ui.system_fonts_choise.clone();
+    let mut system_fonts: Vec<String> = resource_pack_maker::ttf_finder("C:\\Windows\\Fonts");
+    let user_fonts: Vec<String> = resource_pack_maker::ttf_finder(&format!(
+        "C:\\Users\\{}\\AppData\\Local\\Microsoft\\Windows\\Fonts",
+        env::var("USERNAME").unwrap()
+    ));
+    system_fonts.extend(user_fonts);
+    for font in system_fonts.clone() {
+        let _ = &choise.add_choice(&font.replace("\\", "\\\\"));
+    }
+    //choise set callback
+    choise.set_callback(move |cb| {
+        let value = cb.value() as usize;
+        let fonts: &Vec<String> = &system_fonts;
+        let value = fonts.get(value).unwrap().replace("\\\\", "\\");
+        println!("{value}");
+        let name = app.load_font(value).unwrap();
+        dbg!(format!("{name}"));
+        let font = Font::by_name(&name);
+        let view = &mut ui.font_view;
+        view.set_text_font(font);
+        dbg!(format!("{}",view.text_font().get_name()));
+        view.redraw();
+        
+    });
+    //Run app
     app.run().unwrap();
 }

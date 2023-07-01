@@ -1,3 +1,5 @@
+use walkdir::WalkDir;
+
 pub mod reg_tool {
     use std::{ffi::OsStr, iter::once, os::windows::prelude::OsStrExt, ptr::null_mut};
 
@@ -57,4 +59,22 @@ pub mod reg_tool {
             return data_binary;
         }
     }
+}
+
+pub fn ttf_finder(folder_path: &str) -> Vec<String> {
+    let mut ttf_files: Vec<String> = Vec::new();
+    
+    for entry in WalkDir::new(folder_path).into_iter().filter_map(|e| e.ok()) {
+        if let Some(extension) = entry.path().extension() {
+            if extension == "ttf" {
+                let file_path = entry.path().to_path_buf();
+                if let Some(file_path_str) = file_path.to_str() {
+                    println!("{}",file_path_str);
+                    ttf_files.push(file_path_str.to_string());
+                }
+            }
+        }
+    }
+
+    ttf_files
 }

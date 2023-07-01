@@ -61,11 +61,11 @@ class UserInterface {open
             label {浏览}
             xywh {385 120 80 25}
           }
-          Fl_Choice system_fonts_choise {open
-            xywh {165 230 25 25} down_box BORDER_BOX
+          Fl_Choice system_fonts_choise {open selected
+            xywh {165 230 300 25} down_box BORDER_BOX
           } {}
           Fl_Input font_view {
-            label {字体预览} selected
+            label {字体预览}
             xywh {165 285 300 25}
           }
         }
