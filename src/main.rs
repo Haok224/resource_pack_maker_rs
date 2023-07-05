@@ -1,5 +1,6 @@
 use std::env;
 
+use colored::*;
 use fltk::{
     button::{Button, RoundButton},
     dialog::NativeFileChooser,
@@ -15,11 +16,15 @@ use resource_pack_maker::reg_tool;
 use fltk_theme::WidgetTheme;
 
 use winapi::um::winreg::HKEY_CURRENT_USER;
-
 mod ui;
 fn main() {
     //app
     let app = app::App::default().with_scheme(app::Scheme::Oxy);
+    //set app font
+    if app.load_font("C:\\Windows\\Fonts\\SIMYOU.TTF").is_ok() {
+        Font::set_font(Font::Helvetica, "幼圆");
+    }
+
     let mut ui = ui::UserInterface::make_window();
     //Set theme
     let logo = image::PngImage::from_data(&[
@@ -45,24 +50,28 @@ fn main() {
         18, 255, 182, 49, 29, 153, 23, 19, 2, 226, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130,
     ])
     .unwrap();
-    //check the system theme
     let hkey = reg_tool::reg_open(
         HKEY_CURRENT_USER,
         "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-    )
-    .unwrap();
-    let binding = reg_tool::reg_query_binary(&hkey, "AppsUseLightTheme");
-    let dark_value = binding.get(0);
-    let dark_value = dark_value.unwrap(); // 0:dark 1:light
-    if dark_value == &1 {
-        let theme = WidgetTheme::new(fltk_theme::ThemeType::Metro);
-        theme.apply();
+    );
+    //check the system theme
+    if hkey.is_ok() {
+        let hkey = hkey.unwrap();
+        let binding = reg_tool::reg_query_binary(&hkey, "AppsUseLightTheme");
+        let dark_value = binding.get(0);
+        let dark_value = dark_value.unwrap_or_else(|| &1);
+        if dark_value == &1 {
+            let theme = WidgetTheme::new(fltk_theme::ThemeType::Metro);
+            theme.apply();
+        } else {
+            let theme = WidgetTheme::new(fltk_theme::ThemeType::Dark);
+            theme.apply();
+        }
     } else {
-        let theme = WidgetTheme::new(fltk_theme::ThemeType::Dark);
-        theme.apply();
+        eprint!("{} {:#?}", "Err in get system color theme:\n".red(), hkey)
     }
+
     //window
-    println!("{dark_value}");
     let mut window: Window = ui.window;
     window.set_icon(Some(logo));
     window.show();
@@ -70,18 +79,20 @@ fn main() {
     let mut pack_name_input = ui.pack_name;
     pack_name_input.set_callback(|c| {
         //TODO set config
-        println!("{}", c.value())
+        println!("{} {}", "Pack Name:".blue().bold(), c.value())
     });
     let mut des_input: Input = ui.des_input;
     des_input.set_callback(|i| {
         //TODO set des config
-        println!("{}", i.value())
+        println!("{} {}", "Describe".blue().bold(), i.value())
     });
     //choose pack icon
     let mut choose_icon_button: Button = ui.icon_browse;
     let mut icon_box = ui.icon_box.clone();
+    let mut icon_box_a = icon_box.clone();
     icon_box.set_frame(enums::FrameType::EngravedBox);
     let mut icon_input = ui.icon_choose;
+    let mut icon_output = icon_input.clone();
     choose_icon_button.set_callback(move |_| {
         let mut dialog = dialog::NativeFileChooser::new(dialog::NativeFileChooserType::BrowseFile);
         dialog.set_filter("*.png");
@@ -94,8 +105,19 @@ fn main() {
         let image = PngImage::load(path.clone()).expect("Failed to load image.");
         println!("{:?}", image);
         icon_box.set_image_scaled(Some(image));
+        icon_box.show();
         icon_box.redraw();
         icon_input.set_value(path.to_str().unwrap())
+    });
+    //remove icon
+
+    let mut remove_icon: Button = ui.icon_remove.clone();
+    let mut wind = window.clone();
+    remove_icon.set_callback(move |_| {
+        println!("Remove");
+        icon_box_a.hide();
+        wind.redraw();
+        icon_output.set_value("");
     });
 
     //Radio button
@@ -165,15 +187,26 @@ fn main() {
         let value = cb.value() as usize;
         let fonts: &Vec<String> = &system_fonts;
         let value = fonts.get(value).unwrap().replace("\\\\", "\\");
-        println!("{value}");
+        println!("{} {}","Font file:".blue(),value);
         let name = app.load_font(value).unwrap();
-        dbg!(format!("{name}"));
         let font = Font::by_name(&name);
         let view = &mut ui.font_view;
         view.set_text_font(font);
-        dbg!(format!("{}",view.text_font().get_name()));
+        println!("{} {}", "Set font:".green(), cb.value());
         view.redraw();
-        
+    });
+    //panorama
+    let mut pan_0: Button = ui.panorama_0_browse.clone();
+    pan_0.set_callback(|_| {
+        println!("{}", "Choose file".blue().bold());
+        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
+        dialog.show();
+    });
+    let mut pan_1: Button = ui.panorama_1_browse.clone();
+    pan_1.set_callback(|_| {
+        println!("{}", "Choose file".blue().bold());
+        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
+        dialog.show();
     });
     //Run app
     app.run().unwrap();

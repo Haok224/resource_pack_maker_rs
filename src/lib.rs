@@ -69,7 +69,6 @@ pub fn ttf_finder(folder_path: &str) -> Vec<String> {
             if extension == "ttf" {
                 let file_path = entry.path().to_path_buf();
                 if let Some(file_path_str) = file_path.to_str() {
-                    println!("{}",file_path_str);
                     ttf_files.push(file_path_str.to_string());
                 }
             }
@@ -77,4 +76,12 @@ pub fn ttf_finder(folder_path: &str) -> Vec<String> {
     }
 
     ttf_files
+}
+pub mod pack{
+    pub struct PackConfig{
+        
+    }
+    impl PackConfig{
+        
+    }
 }

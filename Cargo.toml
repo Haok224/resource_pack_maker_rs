@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+colored = "2.0.2"
 fltk = "1.4.5"
+fltk-fluid = "0.1.9"
 fltk-theme = "0.7.1"
 walkdir = "2.3.3"
 winapi = {version = "0.3.9",features  = ["winerror","winreg"]}

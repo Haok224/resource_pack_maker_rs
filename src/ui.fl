@@ -8,7 +8,7 @@ class UserInterface {open
   } {
     Fl_Window window {
       label {资源包制作器} open
-      xywh {800 241 550 400} type Double visible
+      xywh {961 203 550 400} type Double visible
     } {
       Fl_Tabs tabs {open
         xywh {0 0 550 400} align 4
@@ -31,22 +31,26 @@ class UserInterface {open
           }
           Fl_Button icon_browse {
             label {浏览}
-            xywh {385 175 80 25}
+            xywh {385 175 40 25}
+          }
+          Fl_Button icon_remove {
+            label {@undo}
+            xywh {425 175 40 25}
           }
           Fl_Box icon_box {
-            xywh {165 230 128 128}
+            xywh {165 260 128 128}
           }
           Fl_Choice {} {
             label {版本} open
-            xywh {395 230 25 25} down_box BORDER_BOX
+            xywh {165 230 300 25} down_box BORDER_BOX
           } {}
         }
         Fl_Group {} {
           label {字体} open
-          xywh {45 35 480 355}
+          xywh {45 35 480 355} hide
         } {
           Fl_Round_Button choose_ttf_mode {
-            label {选择Ttf文件}
+            label {选择字体文件}
             xywh {165 65 25 25} down_box ROUND_DOWN_BOX
           }
           Fl_Round_Button choose_system_font_mode {
@@ -54,21 +58,107 @@ class UserInterface {open
             xywh {165 175 25 25} down_box ROUND_DOWN_BOX
           }
           Fl_Output ttf_output {
-            label {Ttf文件}
             xywh {165 120 220 25}
           }
           Fl_Button ttf_browse {
             label {浏览}
             xywh {385 120 80 25}
           }
-          Fl_Choice system_fonts_choise {open selected
+          Fl_Choice system_fonts_choise {open
             xywh {165 230 300 25} down_box BORDER_BOX
           } {}
           Fl_Input font_view {
-            label {字体预览}
+            label {预览}
             xywh {165 285 300 25}
           }
         }
+        Fl_Group {} {
+          label {主菜单全景图} open
+          xywh {50 40 480 355}
+        } {
+          Fl_Output {panorama _0} {
+            label {Panorama  0
+/tp}
+            xywh {170 65 220 25}
+          }
+          Fl_Button panorama_0_browse {
+            label {浏览}
+            xywh {390 65 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 65 40 25}
+          }
+          Fl_Output {panorama _1} {
+            label {Panorama  1
+/tp}
+            xywh {170 105 220 25}
+          }
+          Fl_Button panorama_1_browse {
+            label {浏览}
+            xywh {390 105 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 105 40 25}
+          }
+          Fl_Output {panorama _2} {
+            label {Panorama  2
+/tp}
+            xywh {170 145 220 25}
+          }
+          Fl_Button panorama_2_browse {
+            label {浏览}
+            xywh {390 145 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 145 40 25}
+          }
+          Fl_Output {panorama _3} {
+            label {Panorama  3
+/tp}
+            xywh {170 185 220 25}
+          }
+          Fl_Button panorama_3_browse {
+            label {浏览}
+            xywh {390 185 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 185 40 25}
+          }
+          Fl_Output {panorama _4} {
+            label {Panorama  4
+/tp}
+            xywh {170 225 220 25}
+          }
+          Fl_Output {panorama _5} {
+            label {Panorama  5
+/tp}
+            xywh {170 265 220 25}
+          }
+          Fl_Button panorama_5_browse {
+            label {浏览} selected
+            xywh {390 265 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 265 40 25}
+          }
+          Fl_Button panorama_4_browse {
+            label {浏览}
+            xywh {390 225 40 25}
+          }
+          Fl_Button {} {
+            label {@undo}
+            xywh {430 225 40 25}
+          }
+        }
+        Fl_Group {} {
+          label {保存} open
+          xywh {50 40 480 355} hide
+        } {}
       }
     }
   }
