@@ -63,7 +63,7 @@ pub mod reg_tool {
 
 pub fn ttf_finder(folder_path: &str) -> Vec<String> {
     let mut ttf_files: Vec<String> = Vec::new();
-    
+
     for entry in WalkDir::new(folder_path).into_iter().filter_map(|e| e.ok()) {
         if let Some(extension) = entry.path().extension() {
             if extension == "ttf" {
@@ -77,11 +77,27 @@ pub fn ttf_finder(folder_path: &str) -> Vec<String> {
 
     ttf_files
 }
-pub mod pack{
-    pub struct PackConfig{
-        
+pub mod pack {
+    pub struct PackConfig {}
+    impl PackConfig {}
+}
+pub mod file_tool {
+    use std::{fs, path::PathBuf};
+
+    use colored::Colorize;
+    use fltk::dialog::{self, NativeFileChooser};
+    //choose a file from a native file chooser
+    pub fn choose_file(filter: &str) -> PathBuf {
+        let mut dialog = NativeFileChooser::new(fltk::dialog::FileDialogType::BrowseFile);
+        dialog.set_filter(filter);
+        dialog.show();
+        dialog.filename()
     }
-    impl PackConfig{
-        
+    pub fn copy_file(source: &str, to: &str) {
+        if fs::copy(source, to).is_err() {
+            let s = format!("Err in copy file:FROM\n{}\nTO\n{}", source, to);
+            eprint!("{}", s.red());
+            dialog::alert_default(&s);
+        }
     }
 }

@@ -76,7 +76,7 @@ class UserInterface {open
           label {主菜单全景图} open
           xywh {50 40 480 355}
         } {
-          Fl_Output {panorama _0} {
+          Fl_Output panorama_0 {
             label {Panorama  0
 /tp}
             xywh {170 65 220 25}
@@ -89,7 +89,7 @@ class UserInterface {open
             label {@undo}
             xywh {430 65 40 25}
           }
-          Fl_Output {panorama _1} {
+          Fl_Output panorama_1 {
             label {Panorama  1
 /tp}
             xywh {170 105 220 25}
@@ -102,7 +102,7 @@ class UserInterface {open
             label {@undo}
             xywh {430 105 40 25}
           }
-          Fl_Output {panorama _2} {
+          Fl_Output panorama_2 {
             label {Panorama  2
 /tp}
             xywh {170 145 220 25}
@@ -115,7 +115,7 @@ class UserInterface {open
             label {@undo}
             xywh {430 145 40 25}
           }
-          Fl_Output {panorama _3} {
+          Fl_Output panorama_3 {
             label {Panorama  3
 /tp}
             xywh {170 185 220 25}
@@ -128,18 +128,18 @@ class UserInterface {open
             label {@undo}
             xywh {430 185 40 25}
           }
-          Fl_Output {panorama _4} {
+          Fl_Output panorama_4 {
             label {Panorama  4
 /tp}
             xywh {170 225 220 25}
           }
-          Fl_Output {panorama _5} {
+          Fl_Output panorama_5 {
             label {Panorama  5
-/tp}
+/tp} selected
             xywh {170 265 220 25}
           }
           Fl_Button panorama_5_browse {
-            label {浏览} selected
+            label {浏览}
             xywh {390 265 40 25}
           }
           Fl_Button {} {

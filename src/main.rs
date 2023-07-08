@@ -3,7 +3,6 @@ use std::env;
 use colored::*;
 use fltk::{
     button::{Button, RoundButton},
-    dialog::NativeFileChooser,
     enums::Font,
     image::PngImage,
     input::Input,
@@ -11,7 +10,7 @@ use fltk::{
     window::Window,
     *,
 };
-use resource_pack_maker::reg_tool;
+use resource_pack_maker::{reg_tool, file_tool};
 
 use fltk_theme::WidgetTheme;
 
@@ -94,10 +93,7 @@ fn main() {
     let mut icon_input = ui.icon_choose;
     let mut icon_output = icon_input.clone();
     choose_icon_button.set_callback(move |_| {
-        let mut dialog = dialog::NativeFileChooser::new(dialog::NativeFileChooserType::BrowseFile);
-        dialog.set_filter("*.png");
-        dialog.show();
-        let path = dialog.filename();
+        let path = file_tool::choose_file("*.png");
         if !path.exists() {
             return;
         }
@@ -106,17 +102,14 @@ fn main() {
         println!("{:?}", image);
         icon_box.set_image_scaled(Some(image));
         icon_box.show();
-        icon_box.redraw();
-        icon_input.set_value(path.to_str().unwrap())
+        icon_input.set_value(path.to_str().unwrap());
     });
     //remove icon
 
     let mut remove_icon: Button = ui.icon_remove.clone();
-    let mut wind = window.clone();
     remove_icon.set_callback(move |_| {
-        println!("Remove");
         icon_box_a.hide();
-        wind.redraw();
+        //wind.redraw();
         icon_output.set_value("");
     });
 
@@ -154,10 +147,7 @@ fn main() {
     let mut ttf_out = ui.ttf_output.clone();
     let mut view = ui.font_view.clone();
     let _ = &mut ttf_browse.set_callback(move |_| {
-        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
-        dialog.set_filter("*.ttf");
-        dialog.show();
-        let path: std::path::PathBuf = dialog.filename();
+        let path: std::path::PathBuf = file_tool::choose_file("*.ttf");
         if !path.exists() {
             return;
         }
@@ -197,16 +187,24 @@ fn main() {
     });
     //panorama
     let mut pan_0: Button = ui.panorama_0_browse.clone();
-    pan_0.set_callback(|_| {
-        println!("{}", "Choose file".blue().bold());
-        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
-        dialog.show();
+    let mut pan_0_out = ui.panorama_0.clone();
+    pan_0.set_callback(move |_| {
+        let file = file_tool::choose_file("*.png");
+        if !file.exists() {
+            return;
+        }
+        pan_0_out.set_value(file.to_str().unwrap_or_else(|| {""}));
     });
+    
     let mut pan_1: Button = ui.panorama_1_browse.clone();
-    pan_1.set_callback(|_| {
+    let mut pan_1_out = ui.panorama_1.clone();
+    pan_1.set_callback(move |_| {
         println!("{}", "Choose file".blue().bold());
-        let mut dialog = NativeFileChooser::new(dialog::FileDialogType::BrowseFile);
-        dialog.show();
+        let file = file_tool::choose_file("*.png");
+        if !file.exists() {
+            return;
+        }
+        pan_1_out.set_value(file.to_str().unwrap_or_else(||{""}));
     });
     //Run app
     app.run().unwrap();
